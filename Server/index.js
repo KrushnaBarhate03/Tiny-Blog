@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import cors from 'cors'
 import dotenv from 'dotenv'
 dotenv.config();
+import { signup,login } from './controllers/User.js';
 
 async function connect(){
 const conn= await mongoose.connect(process.env.MONGODB_URI);
@@ -27,6 +28,9 @@ app.get('/',(req,res)=>{
         message:" Server is running "
     })
 })
+
+app.post("/signup",signup);
+app.post("/login",login);
 const PORT=5002;
 
 app.listen(PORT,()=>{
