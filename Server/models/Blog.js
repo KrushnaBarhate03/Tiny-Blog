@@ -1,6 +1,6 @@
 import {model,Schema} from 'mongoose'
 const blogSchema=new Schema({
-    name:{type:String,required:true},
+    title:{type:String,required:true},
     content:{type:String,required:true},
     status:{
         type:String,
@@ -9,7 +9,8 @@ const blogSchema=new Schema({
     },
     category:{type:String,required:true},
     publishedAt:{type:Date},
-    author:{type:Schema.Types.ObjectId,ref:"User",required:true}
+    author:{type:Schema.Types.ObjectId,ref:"User",required:true},
+    slug:{type:String, required:true,unique:true}
 },
 
 {

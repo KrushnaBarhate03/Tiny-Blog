@@ -1,4 +1,5 @@
 import User from '../models/User.js'
+import md5 from 'md5'
 const signup= async(req,res)=>{
     const {name,email,password}=req.body;
     const emailValidation = /^\w+([.\-]?\w+)*@\w+([.\-]?\w+)*(\.\w{2,3})+$/;
@@ -30,7 +31,7 @@ const signup= async(req,res)=>{
             message:`user with ${email} are already exists`
         })
     }
-    const newUser= new User({name,email,password});
+    const newUser= new User({name,email,password:md5(password)});
     const saved= await newUser.save();
 
     res.json({
@@ -41,7 +42,33 @@ const signup= async(req,res)=>{
     })
 
 }
-const login=(req,res)=>{
+const login= async(req,res)=>{
+    const {email,password}=req.body;
+    const user= await User.findOne({email,password:md5(password)}).select("_id name email");
+
+    if(!user){
+        return res.status(400).json({
+            success:false,
+            data:undefined,
+            message:"User not exists"
+        })
+    }
+
+    // if(!md5(password)){
+    //     return res.status(400).json({
+    //         success:false,
+    //         message:"password is wrong"
+    //     })
+    // }
+
+     res.json({
+            success:true,
+            data:user,
+            message:"Login successfully"
+        })
+
+   
+
 
 }
 export{signup,login}
