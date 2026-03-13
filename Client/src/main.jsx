@@ -9,6 +9,7 @@ import Newblog from './views/Newblog.jsx'
 import  Blog from './views/Blog.jsx'
 import Login from './views/Login.jsx'
 import Signup from './views/Signup.jsx'
+import Readmore from './components/ReadMore.jsx'
  
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -19,6 +20,7 @@ createRoot(document.getElementById('root')).render(
     <Route path='/Blog/:slug' element={<Blog/>}/>
     <Route path='/Login' element={<Login/>}/>
     <Route path="/signup" element={<Signup/>}/>
+    <Route path="/read/:slug" element={<Readmore/>}/>
      </Routes>
 
   </BrowserRouter>,

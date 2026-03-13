@@ -26,8 +26,16 @@ const postblogs=async(req,res)=>{
 
 }
 
+
 const getblogs=async(req,res)=>{
-    const Fetch=await Blog.find().populate('author',"_id name email");
+    const {author}=req.query
+   
+    const condition=[{status:"published"}];
+if(author){
+    condition.push({author:author})
+}
+
+    const Fetch=await Blog.find({$or:condition}).populate('author',"_id name email").sort({status:1,createdAt:-1});
     res.json({
         success:true,
         data:Fetch,
