@@ -3,6 +3,7 @@ import {Link} from 'react-router'
 import Readmore from './ReadMore.jsx'
 
 function Blogcards({title,category,author,createdAt,updatedAt ,slug,status}) {
+  console.log(title,status);
   return (
     <div className="bg-gray-300 mb-4 mt-4 rounded-md relative p-2">
         
@@ -13,8 +14,8 @@ function Blogcards({title,category,author,createdAt,updatedAt ,slug,status}) {
 
       <p className="font-serif absolute right-0 text-white top-0 bg-orange-500 p-1 rounded-sm">{category}</p>
       <p className="font-serif text-xl font-semibold text-start ml-2">{author}</p>
-      <p className='font-["inter"] text-start ml-2'>{createdAt}</p>
-      <p className="font-['inter'] text-start ml-2">{updatedAt}</p>
+      <p className='font-["inter"] text-start ml-2'>{new Date(createdAt).toLocaleString()}</p>
+      <p className="font-['inter'] text-start ml-2">{new Date(updatedAt).toLocaleString()}</p>
       
 
     {status!="published" ?( <Link to={`/edit/${slug}`}>

@@ -4,7 +4,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 dotenv.config();
 import { signup,login } from './controllers/User.js';
-import {postblogs,getblogs} from './controllers/Blog.js'
+import {postblogs,getblogs,getblogbyslug,editblog,publishblog} from './controllers/Blog.js'
 
 async function connect(){
 const conn= await mongoose.connect(process.env.MONGODB_URI);
@@ -34,6 +34,9 @@ app.post("/signup",signup);
 app.post("/login",login);
 app.post("/blogs",postblogs);
 app.get("/blogs",getblogs)
+app.get("/blogs/:slug",getblogbyslug);
+ app.put("/editblogs/:slug",editblog);
+ app.patch('/publishblog/:slug',publishblog)
 const PORT=5002;
 
 app.listen(PORT,()=>{

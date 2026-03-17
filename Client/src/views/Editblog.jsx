@@ -1,9 +1,95 @@
 import React from 'react'
+import MarkdownEditor from '@uiw/react-markdown-editor';
+import {useState,useEffect} from 'react'
+import { BLOG_Category } from './constant';
+import {getUser} from '../util.js'
+import toast,{Toaster} from 'react-hot-toast'
+import axios from 'axios'
+import {useParams} from 'react-router-dom'
+import {Link} from 'react-router'
 
-function Editblog() {
+function Newblog() {
+  const [content,setContent]=useState(" ");
+  const [input ,setInput]=useState(" ");
+  const [category,setCategory]=useState(BLOG_Category[0]);
+   const [user,setUser]=useState(null);
+  //  const [status,setStatus]=useState("draft")
+  const {slug}=useParams();
+  
+
+    useEffect(()=>{
+      setUser(getUser())
+      getBlog();
+    },[])
+
+    const getBlog=async()=>{
+      const response=await axios.get(`${import.meta.env.VITE_API_URL}/blogs/${slug}`);
+      setInput(response.data.data.title);
+      setCategory(response.data.data.category)
+      setContent(response.data.data.content)
+
+    }
+
+
+  const savechanges=async()=>{
+      const response=await axios.put(`${import.meta.env.VITE_API_URL}/editblogs/${slug}`,{
+        title:input,
+        category,
+        content,
+        author:user?._id
+      })
+
+    if(response?.data?.success){
+      toast.success("Blog saved successfully");
+      setTimeout(()=>{
+      window.location.href="/"
+    },3000)
+    }
+    
+  }
+  
+  const publishblog=async()=>{
+    const response =await axios.patch(`${import.meta.env.VITE_API_URL}/publishblog/${slug}`,{
+      status,
+    })
+ console.log(response.data.data.status)
+
+  }
+
+ 
   return (
-    <div>Editblog</div>
+    <div>
+      
+ <input type="text" placeholder="Enter Title" className="rounded-md border border-black p-2 w-full mb-2" value={input} onChange={(e)=>setInput(e.target.value)}/>
+  
+<div className="flex flex-row justify-start items-start">
+  <select className='rounded-md border border-black p-1 mb-2'value={category} onChange={(e)=>setCategory(e.target.value)}>
+    
+    {BLOG_Category.map((cate)=>{
+    return <option key={cate} value={cate}>{cate} </option>
+  })}</select>
+  </div>
+
+     <MarkdownEditor
+      value={content}
+      height="500px"
+      onChange={(value, viewUpdate) => {
+        setContent(value)
+
+      }}/>
+
+       <button type="button" className="text-white mx-2 bg-green-500 p-2 rounded-md font-serif mt-2" onClick={publishblog}>Publish Blog</button>
+
+      <Link to="/">
+     <button type="button" className="text-white bg-blue-500 p-2 rounded-md font-serif mt-2" onClick={savechanges}>saveChanges</button>
+     </Link>
+
+    
+
+     <Toaster/>
+    </div>
+   
   )
 }
 
-export default Editblog
+export default Newblog
