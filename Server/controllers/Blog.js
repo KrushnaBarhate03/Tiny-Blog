@@ -1,9 +1,14 @@
 import Blog from '../models/Blog.js'
+import jwt from 'jsonwebtoken'
 
 const postblogs=async(req,res)=>{
-    const {title ,category ,content ,author}=req.body;
-
-    if(!title ||!category || !content || !author){
+    const {title ,category ,content}=req.body;
+    const {authentication}=req.headers;
+    console.log(authentication);
+    const decodetoken=jwt.verify(authentication.split(" ")[1],process.env.JWT_secret)
+    console.log(decodetoken)
+    
+    if(!title ||!category || !content){
         return res.json({
             success:false,
             message:"title category content author is required "
@@ -12,7 +17,7 @@ const postblogs=async(req,res)=>{
     }
 
 
-    const newBlog=new Blog({title,category,content,author,slug:`temp slug:${Date.now()}`});
+    const newBlog=new Blog({title,category,content,author:decodetoken?.id,slug:`temp slug:${Date.now()}`});
 
     const response= await newBlog.save();
     response.slug=`${title.toLowerCase().replace(/ /g,"-")}-${response._id}`;
@@ -48,7 +53,7 @@ if(author){
 
 const getblogbyslug=async(req,res)=>{
     const{slug} = req.params;
-    // console.log(`This is a Slug ${slug}`);
+   
 
     const response= await Blog.findOne({slug}).populate("author", "_id name email");
     res.json({
@@ -77,6 +82,7 @@ res.json({
 const editblog=async(req,res)=>{
     const {slug}=req.params;
     const {title,category,content,author}=req.body;
+    
     if(!title,!category,!content,!author){
         return res,json({
             success:false,

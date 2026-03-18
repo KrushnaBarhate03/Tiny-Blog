@@ -1,5 +1,6 @@
 import User from '../models/User.js'
 import md5 from 'md5'
+import jwt from 'jsonwebtoken'
 const signup= async(req,res)=>{
     const {name,email,password}=req.body;
     const emailValidation = /^\w+([.\-]?\w+)*@\w+([.\-]?\w+)*(\.\w{2,3})+$/;
@@ -25,6 +26,8 @@ const signup= async(req,res)=>{
         }
     }
     const existuser= await User.findOne({email});
+
+    
     if(existuser){
         res.json({
             success:false,
@@ -60,11 +63,16 @@ const login= async(req,res)=>{
     //         message:"password is wrong"
     //     })
     // }
-
+         const token=jwt.sign(
+            {id:user._id,email:user.email},
+            process.env.JWT_secret,
+            {expiresIn:"1d"}
+         )
      res.json({
             success:true,
             data:user,
-            message:"Login successfully"
+            message:"Login successfully",
+            token
         })
 
    
