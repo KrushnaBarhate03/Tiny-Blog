@@ -3,10 +3,8 @@ import jwt from 'jsonwebtoken'
 
 const postblogs=async(req,res)=>{
     const {title ,category ,content}=req.body;
-    const {authentication}=req.headers;
-    console.log(authentication);
-    const decodetoken=jwt.verify(authentication.split(" ")[1],process.env.JWT_secret)
-    console.log(decodetoken)
+    const {user}=req;
+  
     
     if(!title ||!category || !content){
         return res.json({
@@ -17,7 +15,7 @@ const postblogs=async(req,res)=>{
     }
 
 
-    const newBlog=new Blog({title,category,content,author:decodetoken?.id,slug:`temp slug:${Date.now()}`});
+    const newBlog=new Blog({title,category,content,author:user?.id,slug:`temp slug:${Date.now()}`});
 
     const response= await newBlog.save();
     response.slug=`${title.toLowerCase().replace(/ /g,"-")}-${response._id}`;
@@ -68,6 +66,20 @@ const getblogbyslug=async(req,res)=>{
 
 const publishblog=async(req,res)=>{
     const {slug}=req.params;
+    const {user}=req;
+    const blog=await Blog.findOne({slug})
+    if(!blog){
+        return res.json({
+            success:"false",
+            message:"Blog is not exist"
+        })
+    }
+    if(blog.author.toSstring()!==user?.id){
+        return res.json({
+            success:true,
+            message:"Blog status updated successfully"
+        })
+    }
 
     
 const response=await Blog.findOneAndUpdate({slug},{status:"publish"},{new:true})
@@ -82,6 +94,31 @@ res.json({
 const editblog=async(req,res)=>{
     const {slug}=req.params;
     const {title,category,content,author}=req.body;
+    const {user}=req;
+    console.log(authentication);
+    
+    const responses=await Blog.findOne({slug:slug});
+       
+    if(!responses){
+        return res.json({
+            success:false,
+            message:"Blog is not found"
+        })
+    }
+    if(responses.author.toString()!==user.id){
+        return res.json({
+            success:false,
+            message:"you are not authorize person to update this blog"
+
+        })
+        return res.json({
+            success:true,
+             message:"Blog updated successfully"
+        })
+    }
+    
+        
+    
     
     if(!title,!category,!content,!author){
         return res,json({
